@@ -81,3 +81,15 @@ a:focus-visible { outline: 2px solid white; outline-offset: 5px; border-radius: 
 .pi-particles { width: min(100%, 1100px); height: min(48vw, 500px); min-height: 300px; }
 .pi-particles canvas { display: block; width: 100%; height: 100%; }
 @media (max-width: 767px) { .pi-particles { height: 350px; min-height: 0; } }
+.topic-navigation { margin-bottom: .75rem; }
+.topic-links { display: flex; flex-wrap: wrap; align-items: center; font-size: .875rem; line-height: 1.25rem; }
+.topic-item { white-space: nowrap; }
+.topic-divider { color: #a5c8fa; }
+.topic-link { cursor: pointer; background: linear-gradient(105deg, #a8c9f4 20%, #fff 45%, #a8c9f4 65%); background-size: 250% 100%; background-clip: text; -webkit-text-fill-color: transparent; animation: topic-light 4s linear infinite; }
+.topic-link:hover, .topic-link:focus-visible { text-decoration: underline; text-decoration-color: #e6f5ff; text-underline-offset: 4px; }
+.topic-link:focus-visible { outline: 2px solid white; outline-offset: 4px; border-radius: 2px; }
+.topic-status { color: #c9d9ef; font-size: .7rem; line-height: 1.2; }
+.topic-status:not(:empty) { margin-top: .4rem; }
+@keyframes topic-light { from { background-position: 150% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .topic-link { animation: none; } }
+.hero-name { color: #fff; font-weight: 600; text-shadow: 0 0 12px rgba(154, 210, 255, .55); }
