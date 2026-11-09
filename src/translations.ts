@@ -1,0 +1,7 @@
+export type Language = 'en' | 'pt';
+export const translations = {
+  en: { eyebrow: 'COMPUTING / RESEARCH / SYSTEMS', nav: 'Main navigation', home: 'Home', homeLabel: 'Andrey Souza, home', back: 'Back to top', language: 'Language', heading: 'Where engineering meets intelligence.', hello: 'Hello, I’m', intro: '. I explore the connections between software engineering, artificial intelligence, and applied research.', description: 'A space for ideas, experiments, and systems built with curiosity.', metadata: 'Metadata', localTime: 'Local time', dimensions: 'Dimensions', technologies: 'Technologies', links: 'Links', signature: 'Designed and built in Brazil', meta: 'Andrey Souza — engineering, artificial intelligence, and research.' },
+  pt: { eyebrow: 'COMPUTAÇÃO / PESQUISA / SISTEMAS', nav: 'Navegação principal', home: 'Início', homeLabel: 'Andrey Souza, início', back: 'Voltar ao início', language: 'Idioma', heading: 'Onde a engenharia encontra a inteligência.', hello: 'Olá, eu sou', intro: '. Exploro as conexões entre engenharia de software, inteligência artificial e pesquisa aplicada.', description: 'Um espaço para ideias, experimentos e sistemas construídos com curiosidade.', metadata: 'Metadados', localTime: 'Horário local', dimensions: 'Dimensões', technologies: 'Tecnologias', links: 'Links', signature: 'Projetado e construído no Brasil', meta: 'Andrey Souza — engenharia, inteligência artificial e pesquisa.' },
+} as const;
+export type Copy = (typeof translations)[Language];
+
