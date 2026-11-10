@@ -1,33 +1,28 @@
-name: Quality checks
-
+name: CI Pipeline
 on:
   push:
-    branches: ["main", "feat/**"]
+    branches: [main, 'feat/**']
   pull_request:
-
+permissions:
+  contents: read
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  quality:
+    name: Build and tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
-
-      - name: Install pinned dependencies
-        run: npm ci
-
-      - name: Type-check and build
-        run: npm run build
-
-      - name: Validate generated site assets
-        shell: bash
-        run: |
-          test -s dist/index.html
-          test -s dist/favicon.svg
-          test -n "$(find dist/assets -name '*.js' -print -quit)"
-          test -n "$(find dist/assets -name '*.css' -print -quit)"
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - run: node scripts/check-build.mjs
+      - name: Dependency audit
+        if: runner.os == 'Linux'
+        run: npm audit --audit-level=high

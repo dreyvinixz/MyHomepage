@@ -1,10 +1,13 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { useNearViewport } from '../lib/useNearViewport';
 import { observeAnimation } from '../lib/observeAnimation';
 
 export function WorkWave({ variant }: { variant: number }) {
   const host = useRef<HTMLDivElement>(null);
+  const ready = useNearViewport(host);
   useEffect(() => {
+    if (!ready) return;
     const el = host.current;
     if (!el) return;
     let renderer: THREE.WebGLRenderer;
@@ -50,6 +53,6 @@ export function WorkWave({ variant }: { variant: number }) {
     const observer = new ResizeObserver(resize); observer.observe(el); resize();
     const stop = observeAnimation(el, time => { material.uniforms.uTime.value = Number.isFinite(time) ? time / 1000 : 0; draw(); }, 24);
     return () => { stop(); observer.disconnect(); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
-  }, [variant]);
+  }, [variant, ready]);
   return <div className="work-wave" ref={host} aria-hidden="true" />;
 }

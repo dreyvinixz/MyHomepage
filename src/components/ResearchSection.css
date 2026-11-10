@@ -1,0 +1,11 @@
+.research-section { background:#090a0e; color:#eef4ff; padding:110px 24px 130px; }
+.research-shell { max-width:1050px; margin:auto; }
+.research-heading { max-width:700px; margin:auto; }
+.research-kicker,.research-group h3,.research-row-meta { color:#91baff; font:13px var(--font-mono,monospace); letter-spacing:.04em; }
+.research-heading h2 { margin-top:14px; font-size:clamp(34px,4.5vw,52px); font-weight:500; letter-spacing:-.05em; line-height:1.1; }.research-heading h2 span { color:#77aeff; animation:title-dot-pulse 2.2s ease-in-out infinite; }
+.research-intro { margin-top:18px; color:#fff; font-size:15px; line-height:1.7; max-width:480px; }
+.research-list { max-width:700px; margin:70px auto 0; }.research-group + .research-group { margin-top:48px; }.research-group h3 { margin:0 16px 20px; color:#fff; font-size:13px; }
+.research-row { display:flex; justify-content:space-between; gap:24px; border-bottom:1px solid rgba(198,218,248,.15); padding:19px 16px; }.research-row-main { min-width:0; }.research-row-title { display:inline-flex; align-items:baseline; gap:8px; color:#e1ebfa; font-size:15px; line-height:1.6; transition:color .2s; }.research-row-title:hover { color:#8bbfff; }.research-row-title svg { width:14px; height:14px; flex:none; opacity:.7; }.research-row-meta { flex:none; font-size:11px; color:#a8bedb; text-align:right; padding-top:4px; }
+.research-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }.research-tags span { display:inline-flex; align-items:center; gap:5px; color:#c8d9ee; font:11px var(--font-mono,monospace); }.research-tags span:not(:last-child)::after { content:'·'; margin-left:5px; color:#7894ba; }.research-tags svg { width:13px; height:13px; flex:none; color:#91baff; }.research-tags svg:not([fill="none"]) { fill:currentColor; }.research-dataset { display:inline-block; color:#bad7ff; font-size:12px; margin-top:10px; }.research-dataset:hover { text-decoration:underline; }
+@media(max-width:700px) { .research-section { padding:75px 20px 85px; }.research-list { margin-top:48px; }.research-row { flex-direction:column; gap:8px; }.research-row-meta { text-align:left; order:-1; }.research-row-title { font-size:15px; } }
+@media(prefers-reduced-motion:reduce) { .research-heading h2 span { animation:none; }.research-row-title { transition:none; } }

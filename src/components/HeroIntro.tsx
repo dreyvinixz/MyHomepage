@@ -23,7 +23,7 @@ export function HeroIntro({ copy, language }: { copy: Copy; language: Language }
     return () => media.revert();
   }, []);
   return <div ref={root} className="intro-grid grid w-full max-w-2xl gap-7 md:grid-cols-2 md:gap-10">
-    <div><div data-intro><TopicNavigation language={language} /></div><h1 data-intro className="text-3xl font-medium leading-tight tracking-tight md:text-4xl">{copy.heading}</h1></div>
+    <div><div data-intro><TopicNavigation language={language} /></div><h1 data-intro className="text-3xl font-medium leading-tight tracking-tight md:text-4xl">{copy.heading}</h1><a data-intro className="hero-about-link" href="#about">{language === 'pt' ? 'Sobre e contato' : 'About & contact'}<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9"/></svg></a></div>
     <div className="text-base leading-7 text-blue-100/80"><p data-intro>{copy.hello} <strong data-name className="hero-name">Andrey Souza</strong>{copy.intro}</p><p data-intro className="mt-4">{copy.description}</p></div>
   </div>;
 }
