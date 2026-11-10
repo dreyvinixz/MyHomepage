@@ -1,0 +1,1 @@
+{"rewrites":[{"source":"/updates","destination":"/index.html"},{"source":"/updates/:path*","destination":"/index.html"},{"source":"/privacy","destination":"/index.html"}]}
