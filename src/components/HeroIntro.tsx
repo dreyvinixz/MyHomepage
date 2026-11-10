@@ -12,15 +12,21 @@ export function HeroIntro({ copy, language }: { copy: Copy; language: Language }
     const media = gsap.matchMedia();
     media.add('(prefers-reduced-motion: no-preference)', () => {
       if (!areAnimationsEnabled()) return;
-      const timeline = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, delay: .25 });
+      let timeline: gsap.core.Timeline | undefined;
+      let visible = false;
+      const update = () => { if (!timeline) return; if (visible && !document.hidden && timeline.progress() < 1) timeline.play(); else timeline.pause(); };
+      const observer = new IntersectionObserver(([entry]) => {
+        visible = entry.isIntersecting;
+        if (visible && !timeline) {
+      timeline = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, delay: .25 });
       timeline.from(element.querySelectorAll('[data-intro]'), { opacity: 0, y: 20, duration: .9, stagger: .16, clearProps: 'opacity,transform', immediateRender: true })
         .from(element.querySelector('[data-name]'), { color: '#96c8ff', textShadow: '0 0 18px rgba(124,196,255,.95)', duration: 1.1, clearProps: 'color,textShadow' }, '-=.65');
-      let visible = false;
-      const update = () => { if (visible && !document.hidden && timeline.progress() < 1) timeline.play(); else timeline.pause(); };
-      const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); }, { threshold: .05 });
+        }
+        update();
+      }, { threshold: .05 });
       observer.observe(element);
       document.addEventListener('visibilitychange', update);
-      return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); timeline.kill(); };
+      return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); timeline?.kill(); };
     });
     return () => media.revert();
   }, []);

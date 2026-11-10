@@ -9,7 +9,7 @@ export function ParticleFlow() {
   const host = useRef<HTMLDivElement>(null);
   const ready = useNearViewport(host, '#expertise');
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || window.innerWidth <= 700) return;
     const el = host.current;
     const expertise = document.getElementById('expertise');
     const tree = document.querySelector<HTMLElement>('.tree-illustration');
