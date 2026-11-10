@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import type { Language } from '../translations';
 import { siPython, siTypescript, siJavascript, siHtml5, siCss, siC, siR, siReact, siNextdotjs, siTailwindcss, siVite, siSass, siPwa, siFastapi, siNodedotjs, siDiscorddotjs, siPostgresql, siClickhouse, siRedis, siSqlite, siSupabase, siTensorflow, siKeras, siScikitlearn, siPandas, siNumpy, siGooglegemini, siDocker, siGithubactions, siPytest, siEslint, siLinux, siGit, siGithub } from 'simple-icons';
 import './SkillTree.css';
@@ -28,6 +29,7 @@ export function SkillTree({ language }: { language: Language }) {
       observer = new IntersectionObserver(entries => {
         for (const entry of entries) {
           if (!entry.isIntersecting || seen.has(entry.target)) continue;
+          if (!areAnimationsEnabled()) { seen.add(entry.target); continue; }
           seen.add(entry.target);
           gsap.fromTo(entry.target, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .8, ease: 'power3.out', clearProps: 'opacity,transform' });
           if (entry.target.classList.contains('tree-cluster')) {
@@ -35,7 +37,8 @@ export function SkillTree({ language }: { language: Language }) {
           }
           observer?.unobserve(entry.target);
         }
-      }, { threshold: .12 });
+      // Let the spiral finish fading before the next section starts its entrance.
+      }, { threshold: .12, rootMargin: '0px 0px -55% 0px' });
       root.querySelectorAll('.skill-heading, .tree-cluster, .tree-root, .skill-footnote').forEach(item => observer?.observe(item));
     });
     return () => { observer?.disconnect(); media.revert(); gsap.killTweensOf(root.querySelectorAll('.skill-heading, .tree-cluster, .tree-cluster li, .tree-root, .skill-footnote')); };

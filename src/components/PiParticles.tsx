@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { observeAnimation } from '../lib/observeAnimation';
+import { areAnimationsEnabled, subscribeMotionPreference } from '../lib/motionPreference';
 
 // Particle rendering adapted from Maxime Heckel's MIT-licensed blog; see REFERENCE-LICENSE.txt.
 export function PiParticles() {
@@ -52,11 +53,12 @@ export function PiParticles() {
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
     const onScroll = () => {
       const top = hero?.getBoundingClientRect().top ?? 0;
-      material.uniforms.uDissolve.value = motion.matches ? 0 : THREE.MathUtils.clamp(-top / (window.innerHeight * .75), 0, 1);
+      material.uniforms.uDissolve.value = motion.matches || !areAnimationsEnabled() ? 0 : THREE.MathUtils.clamp(-top / (window.innerHeight * .75), 0, 1);
       if (el.getBoundingClientRect().bottom > 0 && el.getBoundingClientRect().top < innerHeight) draw();
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     motion.addEventListener('change', onScroll);
+    const unsubscribeMotionPreference = subscribeMotionPreference(onScroll);
     onScroll();
     let stopAnimation: (() => void) | undefined;
     let disposed = false;
@@ -79,7 +81,7 @@ export function PiParticles() {
       material.uniforms.uFormation.value = 1;
       draw();
     });
-    return () => { disposed = true; stopAnimation?.(); observer.disconnect(); window.removeEventListener('scroll', onScroll); motion.removeEventListener('change', onScroll); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { disposed = true; stopAnimation?.(); unsubscribeMotionPreference(); observer.disconnect(); window.removeEventListener('scroll', onScroll); motion.removeEventListener('change', onScroll); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   return <div ref={host} className="pi-particles" aria-hidden="true" />;
 }

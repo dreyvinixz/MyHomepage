@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import type { Language } from '../translations';
 import './ExpertiseSection.css';
 import { ParticleFlow } from './ParticleFlow';
@@ -17,7 +18,7 @@ export function ExpertiseSection({ language }: { language: Language }) {
     const root = section.current; if (!root) return;
     const media = gsap.matchMedia(); let observer: IntersectionObserver | undefined;
     media.add('(prefers-reduced-motion: no-preference)', () => {
-      observer = new IntersectionObserver(entries => entries.forEach(entry => { if (!entry.isIntersecting) return; gsap.fromTo(entry.target, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .7, ease: 'power3.out', clearProps: 'opacity,transform' }); observer?.unobserve(entry.target); }), { threshold: .1 });
+      observer = new IntersectionObserver(entries => entries.forEach(entry => { if (!entry.isIntersecting) return; if (!areAnimationsEnabled()) { observer?.unobserve(entry.target); return; } gsap.fromTo(entry.target, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: .7, ease: 'power3.out', clearProps: 'opacity,transform' }); observer?.unobserve(entry.target); }), { threshold: .1 });
       root.querySelectorAll('.expertise-heading, .expertise-row').forEach(item => observer?.observe(item));
     });
     return () => { observer?.disconnect(); media.revert(); gsap.killTweensOf(root.querySelectorAll('.expertise-heading, .expertise-row')); };

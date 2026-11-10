@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useNearViewport } from '../lib/useNearViewport';
 import { observeAnimation } from '../lib/observeAnimation';
+import { areAnimationsEnabled, subscribeMotionPreference } from '../lib/motionPreference';
 
 /** Flat particle spiral, centered in Technical Expertise. */
 export function ExpertiseAmbient() {
@@ -33,12 +34,33 @@ export function ExpertiseAmbient() {
     const scene = new THREE.Scene(); scene.add(new THREE.Points(geometry,material)); const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
     const draw = () => renderer.render(scene,camera);
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    const onScroll = () => { const rect = section.getBoundingClientRect(); const spiral = el.getBoundingClientRect(); const hero = document.querySelector<HTMLElement>('.hero'); const start = (hero?.getBoundingClientRect().top ?? 0) + scrollY + innerHeight * .05; const end = spiral.top + scrollY - innerHeight * .58; const progress = THREE.MathUtils.clamp((scrollY - start) / Math.max(end - start, 1), 0, 1); material.uniforms.uEnter.value = motion.matches ? 1 : THREE.MathUtils.clamp((progress - .72) / .28, 0, 1); material.uniforms.uExit.value = motion.matches ? 0 : THREE.MathUtils.clamp((innerHeight * .55 - rect.bottom) / (innerHeight * .55),0,1); if (rect.top < innerHeight && rect.bottom > 0) draw(); };
+    const onScroll = () => {
+      const rect = section.getBoundingClientRect();
+      const spiral = el.getBoundingClientRect();
+      const nextHeading = document.querySelector<HTMLElement>('#skill-tree .skill-heading');
+      const hero = document.querySelector<HTMLElement>('.hero');
+      const start = (hero?.getBoundingClientRect().top ?? 0) + scrollY + innerHeight * .05;
+      const end = spiral.top + scrollY - innerHeight * .58;
+      const progress = THREE.MathUtils.clamp((scrollY - start) / Math.max(end - start, 1), 0, 1);
+      const headingTop = nextHeading?.getBoundingClientRect().top ?? innerHeight * 2;
+      // Settle and clear the spiral before the next section's heading animates in.
+      const animationsEnabled = areAnimationsEnabled() && !motion.matches;
+      const exit = animationsEnabled ? THREE.MathUtils.clamp((innerHeight * .95 - headingTop) / (innerHeight * .4), 0, 1) : 0;
+      material.uniforms.uEnter.value = animationsEnabled ? THREE.MathUtils.clamp((progress - .72) / .28, 0, 1) : 1;
+      material.uniforms.uExit.value = exit;
+      if (rect.top < innerHeight && rect.bottom > 0) draw();
+    };
     window.addEventListener('scroll',onScroll,{passive:true}); motion.addEventListener('change',onScroll);
+    const unsubscribeMotionPreference = subscribeMotionPreference(onScroll);
     const resize = () => { const w=el.clientWidth,h=el.clientHeight; if(!w||!h)return; renderer.setSize(w,h); material.uniforms.uScale.value.set(Math.min(1,h/w*2.2),1); onScroll(); };
     const observer=new ResizeObserver(resize); observer.observe(el); resize();
-    const stop=observeAnimation(el,time=>{ material.uniforms.uTime.value=Number.isFinite(time)?time/1000:0; draw(); });
-    return ()=>{ stop(); observer.disconnect(); window.removeEventListener('scroll',onScroll); motion.removeEventListener('change',onScroll); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    let settledTime = 0;
+    const stop=observeAnimation(el,time=>{
+      if (material.uniforms.uExit.value < .001) settledTime = Number.isFinite(time) ? time / 1000 : settledTime;
+      material.uniforms.uTime.value = settledTime;
+      draw();
+    });
+    return ()=>{ stop(); unsubscribeMotionPreference(); observer.disconnect(); window.removeEventListener('scroll',onScroll); motion.removeEventListener('change',onScroll); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   },[ready]);
   return <div ref={host} className="expertise-ambient" aria-hidden="true" />;
 }

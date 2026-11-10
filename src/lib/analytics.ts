@@ -1,6 +1,9 @@
 export type AnalyticsChoice = 'accepted' | 'rejected';
 export const CONSENT_KEY = 'homepage-analytics-consent-v1';
-const id = (import.meta.env.VITE_GA_MEASUREMENT_ID || '').trim();
+// GA4 measurement IDs are public identifiers. Keep the site ready to measure
+// after consent even when the deployment has no custom Vite environment value.
+const configuredId = import.meta.env.VITE_GA_MEASUREMENT_ID;
+const id = (configuredId === undefined ? 'G-BWESBJB5YE' : configuredId).trim();
 export const measurementId = /^G-[A-Z0-9]+$/i.test(id) ? id : '';
 
 type AnalyticsWindow = Window & { dataLayer?: unknown[]; gtag?: (...args: unknown[]) => void };

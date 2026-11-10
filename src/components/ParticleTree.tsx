@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { useNearViewport } from '../lib/useNearViewport';
 import { observeAnimation } from '../lib/observeAnimation';
+import { areAnimationsEnabled, subscribeMotionPreference } from '../lib/motionPreference';
 
 /** Particle overlay sampled from the existing tree paths. */
 export function ParticleTree() {
@@ -35,13 +36,13 @@ export function ParticleTree() {
     const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
     const draw = () => renderer.render(scene,camera);
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    const onScroll = () => { const top = el.getBoundingClientRect().top; const expertise = document.getElementById('expertise'); const start = (expertise?.getBoundingClientRect().bottom ?? 0) + scrollY - innerHeight * .55; const end = top + scrollY - innerHeight * .3; const progress = THREE.MathUtils.clamp((scrollY - start) / Math.max(end - start, 1), 0, 1); material.uniforms.uBuild.value = motion.matches ? 1 : THREE.MathUtils.clamp((progress - .68) / .32, 0, 1); if (top < innerHeight && el.getBoundingClientRect().bottom > 0) draw(); };
-    window.addEventListener('scroll', onScroll, { passive: true }); motion.addEventListener('change', onScroll); onScroll();
+    const onScroll = () => { const top = el.getBoundingClientRect().top; const expertise = document.getElementById('expertise'); const start = (expertise?.getBoundingClientRect().bottom ?? 0) + scrollY - innerHeight * .55; const end = top + scrollY - innerHeight * .3; const progress = THREE.MathUtils.clamp((scrollY - start) / Math.max(end - start, 1), 0, 1); material.uniforms.uBuild.value = motion.matches || !areAnimationsEnabled() ? 1 : THREE.MathUtils.clamp((progress - .68) / .32, 0, 1); if (top < innerHeight && el.getBoundingClientRect().bottom > 0) draw(); };
+    window.addEventListener('scroll', onScroll, { passive: true }); motion.addEventListener('change', onScroll); const unsubscribeMotionPreference = subscribeMotionPreference(onScroll); onScroll();
     const resize = () => { if (!el.clientWidth || !el.clientHeight) return; renderer.setSize(el.clientWidth,el.clientHeight); draw(); };
     const observer = new ResizeObserver(resize); observer.observe(el); resize();
     tree.classList.add('has-particle-tree'); onScroll();
     const stop = observeAnimation(el, time => { material.uniforms.uTime.value = Number.isFinite(time) ? time / 1000 : 0; draw(); });
-    return () => { stop(); observer.disconnect(); window.removeEventListener('scroll', onScroll); motion.removeEventListener('change', onScroll); tree.classList.remove('has-particle-tree'); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { stop(); unsubscribeMotionPreference(); observer.disconnect(); window.removeEventListener('scroll', onScroll); motion.removeEventListener('change', onScroll); tree.classList.remove('has-particle-tree'); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, [ready]);
   return <div ref={host} className="particle-tree" aria-hidden="true" />;
 }

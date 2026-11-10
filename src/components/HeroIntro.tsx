@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import type { Copy, Language } from '../translations';
 import { TopicNavigation } from './TopicNavigation';
 
@@ -10,6 +11,7 @@ export function HeroIntro({ copy, language }: { copy: Copy; language: Language }
     if (!element) return;
     const media = gsap.matchMedia();
     media.add('(prefers-reduced-motion: no-preference)', () => {
+      if (!areAnimationsEnabled()) return;
       const timeline = gsap.timeline({ paused: true, defaults: { ease: 'power3.out' }, delay: .25 });
       timeline.from(element.querySelectorAll('[data-intro]'), { opacity: 0, y: 20, duration: .9, stagger: .16, clearProps: 'opacity,transform', immediateRender: true })
         .from(element.querySelector('[data-name]'), { color: '#96c8ff', textShadow: '0 0 18px rgba(124,196,255,.95)', duration: 1.1, clearProps: 'color,textShadow' }, '-=.65');

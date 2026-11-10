@@ -32,7 +32,16 @@ a:focus-visible { outline: 2px solid white; outline-offset: 5px; border-radius: 
 .language-picker select { color: white; background: transparent; cursor: pointer; font: inherit; }
 .language-picker option { color: #fff; background: #121d32; }
 .language-picker select:focus-visible { outline: 2px solid white; outline-offset: 4px; }
+.motion-toggle { display:inline-flex; align-items:center; gap:5px; color:#e7f1ff; font:10px var(--font-mono,monospace); letter-spacing:.04em; cursor:pointer; white-space:nowrap; }
+.motion-toggle svg { width:16px; height:16px; }
+.motion-toggle-indicator { width:6px; height:6px; border-radius:50%; background:#8dbbff; box-shadow:0 0 8px #8dbbff; }
+.motion-toggle[aria-pressed="false"] .motion-toggle-indicator { background:#a3a9b5; box-shadow:none; }
+.motion-toggle:focus-visible { outline:2px solid #fff; outline-offset:4px; }
+html[data-animations="off"] *, html[data-animations="off"] *::before, html[data-animations="off"] *::after { animation:none !important; transition:none !important; scroll-behavior:auto !important; }
+html[data-animations="off"] .quantbase-chart-line { stroke-dashoffset:0; }
+html[data-animations="off"] .quantbase-chart-end { opacity:1; }
 @media (max-width: 420px) { header nav { gap: 12px !important; padding-inline: 12px !important; } .language-picker { padding-left: 10px; } }
+@media (max-width: 640px) { .motion-toggle span { display:none; } .motion-toggle { gap:0; } }
 
 /* Technical typeface used alongside Inter on the reference blog.
    Departure Mono © Helena Zhang; SIL Open Font License 1.1.

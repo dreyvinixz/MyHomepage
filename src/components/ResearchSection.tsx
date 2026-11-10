@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import { siPython, siR } from 'simple-icons';
 import type { Language } from '../translations';
 import './ResearchSection.css';
@@ -29,6 +30,7 @@ export function ResearchSection({ language }: { language: Language }) {
     media.add('(prefers-reduced-motion: no-preference)', () => {
       observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (!entry.isIntersecting) return;
+        if (!areAnimationsEnabled()) { observer?.unobserve(entry.target); return; }
         gsap.fromTo(entry.target, { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: .65, ease: 'power3.out', clearProps: 'opacity,transform' });
         observer?.unobserve(entry.target);
       }), { threshold: .1 });

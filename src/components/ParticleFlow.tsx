@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import * as THREE from 'three';
 import { useNearViewport } from '../lib/useNearViewport';
+import { areAnimationsEnabled, subscribeMotionPreference } from '../lib/motionPreference';
 
 /** Scroll-driven transition from the expertise section to the tree. */
 export function ParticleFlow() {
@@ -38,11 +39,12 @@ export function ParticleFlow() {
     let pending = 0;
     const update = () => {
       pending = 0;
-      if (motion.matches || innerWidth <= 700 || document.hidden) { renderer.clear(); return; }
+      if (motion.matches || !areAnimationsEnabled() || innerWidth <= 700 || document.hidden) { renderer.clear(); return; }
       const sectionRect = expertise.getBoundingClientRect(), treeRect = tree.getBoundingClientRect();
       const spiralRect = expertise.querySelector<HTMLElement>('.expertise-ambient')?.getBoundingClientRect();
       const sourceY = spiralRect ? spiralRect.top + spiralRect.height / 2 : sectionRect.bottom;
-      const start = sectionRect.bottom + scrollY - innerHeight * .55;
+      // Begin the handoff after the expertise spiral has cleared the viewport.
+      const start = sectionRect.bottom + scrollY - innerHeight * .4;
       const end = treeRect.top + scrollY - innerHeight * .3;
       const progress = THREE.MathUtils.clamp((scrollY-start)/Math.max(end-start,1),0,1);
       material.uniforms.uProgress.value = progress;
@@ -52,8 +54,8 @@ export function ParticleFlow() {
     };
     const schedule = () => { if (!pending) pending = requestAnimationFrame(update); };
     const resize = () => { renderer.setSize(innerWidth,innerHeight); material.uniforms.uViewport.value.set(innerWidth,innerHeight); schedule(); };
-    window.addEventListener('scroll',schedule,{passive:true}); window.addEventListener('resize',resize); document.addEventListener('visibilitychange',schedule); motion.addEventListener('change',schedule); resize();
-    return () => { cancelAnimationFrame(pending); window.removeEventListener('scroll',schedule); window.removeEventListener('resize',resize); document.removeEventListener('visibilitychange',schedule); motion.removeEventListener('change',schedule); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    window.addEventListener('scroll',schedule,{passive:true}); window.addEventListener('resize',resize); document.addEventListener('visibilitychange',schedule); motion.addEventListener('change',schedule); const unsubscribeMotionPreference = subscribeMotionPreference(schedule); resize();
+    return () => { cancelAnimationFrame(pending); unsubscribeMotionPreference(); window.removeEventListener('scroll',schedule); window.removeEventListener('resize',resize); document.removeEventListener('visibilitychange',schedule); motion.removeEventListener('change',schedule); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, [ready]);
   return createPortal(<div ref={host} className="expertise-particle-flow" aria-hidden="true" />, document.body);
 }
