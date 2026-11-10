@@ -93,3 +93,10 @@ a:focus-visible { outline: 2px solid white; outline-offset: 5px; border-radius: 
 @keyframes topic-light { from { background-position: 150% 0; } to { background-position: -100% 0; } }
 @media (prefers-reduced-motion: reduce) { .topic-link { animation: none; } }
 .hero-name { color: #fff; font-weight: 600; text-shadow: 0 0 12px rgba(154, 210, 255, .55); }
+/* Keep small supporting text readable against the dark background. */
+.footer-details h3, .footer-details span, .footer-details time, .footer-section h2, .footer-signature p, .footer-signature em, .topic-status, .neural-hint { color: #fff; font-size: 13px; }
+.topic-divider, .topic-link { color: #fff; }
+.topic-link { background-image: linear-gradient(105deg, #fff 20%, #b9dbff 45%, #fff 65%); }
+.skill-heading h2 span, .work-heading h2 span { display: inline-block; animation: title-dot-pulse 2.2s ease-in-out infinite; }
+@keyframes title-dot-pulse { 0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(117, 177, 255, .65); } 50% { opacity: .3; text-shadow: none; } }
+@media (prefers-reduced-motion: reduce) { .skill-heading h2 span, .work-heading h2 span { animation: none; } }

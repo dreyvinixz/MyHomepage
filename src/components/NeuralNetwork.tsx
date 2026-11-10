@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { observeAnimation } from '../lib/observeAnimation';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Language } from '../translations';
 
@@ -93,7 +94,6 @@ export function NeuralNetwork({ language }: { language: Language }) {
     const pulseMaterial = new THREE.PointsMaterial({ color: '#ffffff', size: .075, transparent: true, opacity: .95, blending: THREE.AdditiveBlending, depthWrite: false });
     group.add(new THREE.Points(pulseGeometry, pulseMaterial));
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0, start = 0;
     const draw = (time: number) => {
       const seconds = time / 1000;
       for (let i = 0; i < count; i++) {
@@ -118,14 +118,12 @@ export function NeuralNetwork({ language }: { language: Language }) {
       });
       renderer.render(scene, camera);
     };
-    const animate = (now: number) => { if (!start) start = now; controls.update(); draw(now - start); frame = requestAnimationFrame(animate); };
-    const update = () => { cancelAnimationFrame(frame); draw(0); if (!motion.matches && !document.hidden) { start = 0; frame = requestAnimationFrame(animate); } };
+    const stopAnimation = observeAnimation(element, time => { controls.update(); draw(Number.isFinite(time) ? time : 0); });
     const resize = () => { const w = element.clientWidth, h = element.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); draw(0); };
     const observer = new ResizeObserver(resize); observer.observe(element); resize();
     const onControlsChange = () => { if (motion.matches) draw(0); };
     controls.addEventListener('change', onControlsChange);
-    motion.addEventListener('change', update); document.addEventListener('visibilitychange', update); update();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); controls.removeEventListener('change', onControlsChange); controls.dispose(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); edges.dispose(); edgeMaterial.dispose(); nodeGeometry.dispose(); group.traverse(object => { if (object instanceof THREE.Mesh && object.geometry === nodeGeometry && object.material instanceof THREE.Material) object.material.dispose(); }); nodeMaterial.dispose(); inputGeometry.dispose(); inputMaterial.dispose(); pulseGeometry.dispose(); pulseMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    return () => { stopAnimation(); observer.disconnect(); controls.removeEventListener('change', onControlsChange); controls.dispose(); edges.dispose(); edgeMaterial.dispose(); nodeGeometry.dispose(); group.traverse(object => { if (object instanceof THREE.Mesh && object.geometry === nodeGeometry && object.material instanceof THREE.Material) object.material.dispose(); }); nodeMaterial.dispose(); inputGeometry.dispose(); inputMaterial.dispose(); pulseGeometry.dispose(); pulseMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   return <div ref={host} className="neural-network" role="img" aria-label={language === 'pt' ? 'Rede neural tridimensional ilustrativa. Arraste para girar.' : 'Illustrative three-dimensional neural network. Drag to rotate.'}><span className="neural-hint">{language === 'pt' ? 'Arraste para girar' : 'Drag to rotate'}</span></div>;
 }

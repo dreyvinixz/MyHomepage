@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { observeAnimation } from '../lib/observeAnimation';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import type { Language } from '../translations';
 
@@ -49,20 +50,19 @@ export function GradientDescent({ language }: { language: Language }) {
     const haloMaterial = new THREE.MeshBasicMaterial({ color: '#8ad8ff', transparent: true, opacity: .25, blending: THREE.AdditiveBlending, depthWrite: false });
     const halo = new THREE.Mesh(haloGeometry, haloMaterial); scene.add(halo);
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0, start = 0, elapsed = 0;
+    let elapsed = 0;
     const draw = () => {
       const progress = motion.matches ? 1 : Math.min((elapsed % 12000) / 9000, 1);
       const at = progress * (path.length - 1), i = Math.floor(at);
       point.position.copy(path[i]).lerp(path[Math.min(i + 1, path.length - 1)], at - i);
       halo.position.copy(point.position); renderer.render(scene, camera);
     };
-    const animate = (now: number) => { if (!start) start = now; elapsed = now - start; controls.update(); draw(); frame = requestAnimationFrame(animate); };
-    const update = () => { cancelAnimationFrame(frame); start = 0; draw(); if (!motion.matches && !document.hidden) frame = requestAnimationFrame(animate); };
+    const stopAnimation = observeAnimation(el, time => { elapsed = Number.isFinite(time) ? time : 0; controls.update(); draw(); });
     const onChange = () => { if (motion.matches) draw(); };
     const resize = () => { const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.updateProjectionMatrix(); draw(); };
     const observer = new ResizeObserver(resize); observer.observe(el); resize();
-    controls.addEventListener('change', onChange); motion.addEventListener('change', update); document.addEventListener('visibilitychange', update); update();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); controls.removeEventListener('change', onChange); controls.dispose(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); surface.dispose(); fill.dispose(); wire.dispose(); wireMaterial.dispose(); lineGeometry.dispose(); lineMaterial.dispose(); pointGeometry.dispose(); pointMaterial.dispose(); haloGeometry.dispose(); haloMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    controls.addEventListener('change', onChange);
+    return () => { stopAnimation(); observer.disconnect(); controls.removeEventListener('change', onChange); controls.dispose(); surface.dispose(); fill.dispose(); wire.dispose(); wireMaterial.dispose(); lineGeometry.dispose(); lineMaterial.dispose(); pointGeometry.dispose(); pointMaterial.dispose(); haloGeometry.dispose(); haloMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   return <div ref={host} className="neural-network" role="img" aria-label={language === 'pt' ? 'Visualização ilustrativa de descida do gradiente em uma superfície de erro' : 'Illustrative gradient descent on a loss surface'}><span className="neural-hint">{language === 'pt' ? 'Arraste para girar · descida do gradiente' : 'Drag to rotate · gradient descent'}</span></div>;
 }

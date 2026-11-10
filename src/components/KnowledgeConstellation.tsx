@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
+import { observeAnimation } from '../lib/observeAnimation';
 import type { Language } from '../translations';
 
 // Orion's familiar outline, stylized in depth; technology associations are personal.
@@ -94,11 +95,13 @@ export function KnowledgeConstellation({ language }: { language: Language }) {
     const resize = () => { const w = container.clientWidth, h = container.clientHeight; if (!w || !h) return; renderer.setSize(w, h); camera.aspect = w / h; camera.position.z = w < 600 ? 12.5 : 6.2; camera.updateProjectionMatrix(); draw(); };
     const observer = new ResizeObserver(resize); observer.observe(container); resize();
     const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let animation = 0; let last = 0;
-    const render = (now: number) => { if (last && !engaged.current) targetY = -.12 + Math.sin(now * .00022) * .24; group.rotation.x += (targetX - group.rotation.x) * .05; group.rotation.y += (targetY - group.rotation.y) * .05; last = now; draw(); animation = requestAnimationFrame(render); };
-    const update = () => { cancelAnimationFrame(animation); last = 0; draw(); if (!motion.matches && !document.hidden) animation = requestAnimationFrame(render); };
-    motion.addEventListener('change', update); document.addEventListener('visibilitychange', update); update();
-    return () => { cancelAnimationFrame(animation); container.removeEventListener('pointerdown', pointerDown); container.removeEventListener('pointermove', pointerMove); container.removeEventListener('pointerup', pointerUp); container.removeEventListener('pointercancel', pointerUp); observer.disconnect(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); geometry.dispose(); material.dispose(); lines.dispose(); lineMaterial.dispose(); starGeometry.dispose(); starMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    const stopAnimation = observeAnimation(container, now => {
+      if (!engaged.current && Number.isFinite(now)) targetY = -.12 + Math.sin(now * .00022) * .24;
+      group.rotation.x += (targetX - group.rotation.x) * .1;
+      group.rotation.y += (targetY - group.rotation.y) * .1;
+      draw();
+    });
+    return () => { stopAnimation(); container.removeEventListener('pointerdown', pointerDown); container.removeEventListener('pointermove', pointerMove); container.removeEventListener('pointerup', pointerUp); container.removeEventListener('pointercancel', pointerUp); observer.disconnect(); geometry.dispose(); material.dispose(); lines.dispose(); lineMaterial.dispose(); starGeometry.dispose(); starMaterial.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   const active = hovered ?? selected;
   return <div ref={host} className="knowledge-constellation" role="group" aria-label={language === 'pt' ? 'Constelação de Órion e tecnologias' : 'Orion constellation and technologies'}>

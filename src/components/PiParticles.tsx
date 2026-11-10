@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
+import { observeAnimation } from '../lib/observeAnimation';
 
 // Particle rendering adapted from Maxime Heckel's MIT-licensed blog; see REFERENCE-LICENSE.txt.
 export function PiParticles() {
@@ -44,26 +45,18 @@ export function PiParticles() {
       transparent: true, blending: THREE.AdditiveBlending, depthWrite: false,
     });
     const points = new THREE.Points(geometry, material); points.rotation.z = -.04; scene.add(points);
-    const motion = matchMedia('(prefers-reduced-motion: reduce)');
-    let frame = 0, previous = 0, elapsed = 0;
     const draw = () => renderer.render(scene, camera);
-    const animate = (now: number) => {
-      if (previous) elapsed += Math.min(now - previous, 50);
-      previous = now;
-      material.uniforms.uTime.value = elapsed / 1000;
-      material.uniforms.uFormation.value = Math.min(elapsed / 2600, 1);
-      points.position.y = Math.sin(material.uniforms.uTime.value * .8) * .18 * material.uniforms.uFormation.value;
-      draw(); frame = requestAnimationFrame(animate);
-    };
-    const update = () => {
-      cancelAnimationFrame(frame); previous = 0;
-      if (motion.matches) { material.uniforms.uFormation.value = 1; elapsed = Math.max(elapsed, 2600); points.position.y = 0; }
+    const stopAnimation = observeAnimation(el, elapsed => {
+      const reduced = !Number.isFinite(elapsed);
+      const seconds = reduced ? 0 : elapsed / 1000;
+      material.uniforms.uTime.value = seconds;
+      material.uniforms.uFormation.value = reduced ? 1 : Math.min(elapsed / 2600, 1);
+      points.position.y = reduced ? 0 : Math.sin(seconds * .8) * .18 * material.uniforms.uFormation.value;
       draw();
-      if (!motion.matches && !document.hidden) frame = requestAnimationFrame(animate);
-    };
+    });
     const resize = () => { const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return; renderer.setSize(w,h); camera.aspect = w / h; camera.position.z = w < 600 ? 5.5 : 3.2; camera.updateProjectionMatrix(); draw(); };
-    const observer = new ResizeObserver(resize); observer.observe(el); resize(); motion.addEventListener('change', update); document.addEventListener('visibilitychange', update); update();
-    return () => { cancelAnimationFrame(frame); observer.disconnect(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
+    const observer = new ResizeObserver(resize); observer.observe(el); resize();
+    return () => { stopAnimation(); observer.disconnect(); geometry.dispose(); material.dispose(); renderer.dispose(); renderer.domElement.remove(); };
   }, []);
   return <div ref={host} className="pi-particles" aria-hidden="true" />;
 }
