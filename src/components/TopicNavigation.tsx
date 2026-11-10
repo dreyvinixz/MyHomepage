@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { Language } from '../translations';
+import { areAnimationsEnabled, subscribeMotionPreference } from '../lib/motionPreference';
 
 const topics = [
   { en: 'COMPUTING', pt: 'COMPUTAÇÃO', quoteEn: 'Computer science is no more about computers than astronomy is about telescopes.', quotePt: 'A ciência da computação não trata mais de computadores do que a astronomia trata de telescópios.', author: 'Edsger W. Dijkstra', source: 'https://www.cs.utexas.edu/~EWD/DijkstraMemorialLectures/Tony%20Hoare.html' },
@@ -14,10 +15,11 @@ export function TopicNavigation({ language }: { language: Language }) {
     let timer = 0;
     const schedule = () => {
       window.clearTimeout(timer);
-      if (!motion.matches && !document.hidden) timer = window.setTimeout(() => setSelected(current => (current + 1) % topics.length), 7000);
+      if (!motion.matches && areAnimationsEnabled() && !document.hidden) timer = window.setTimeout(() => setSelected(current => (current + 1) % topics.length), 7000);
     };
+    const unsubscribeMotionPreference = subscribeMotionPreference(schedule);
     motion.addEventListener('change', schedule); document.addEventListener('visibilitychange', schedule); schedule();
-    return () => { window.clearTimeout(timer); motion.removeEventListener('change', schedule); document.removeEventListener('visibilitychange', schedule); };
+    return () => { window.clearTimeout(timer); unsubscribeMotionPreference(); motion.removeEventListener('change', schedule); document.removeEventListener('visibilitychange', schedule); };
   }, [selected]);
   const pt = language === 'pt'; const topic = topics[selected];
   return <div className="topic-navigation"><div className="topic-links" aria-label={pt ? 'Áreas de interesse' : 'Areas of interest'}>{topics.map((item, index) => <span className="topic-item" key={item.en}>{index > 0 && <span className="topic-divider" aria-hidden="true"> / </span>}<button type="button" className="topic-link" aria-pressed={selected === index} onClick={() => setSelected(index)}>{pt ? item.pt : item.en}</button></span>)}</div><div className="topic-status" aria-live="off"><p key={topic.en} className="topic-quote">“{pt ? topic.quotePt : topic.quoteEn}” <a href={topic.source} target="_blank" rel="noopener noreferrer">— {topic.author}</a>{pt && <span className="topic-translation"> (tradução livre)</span>}</p></div></div>;

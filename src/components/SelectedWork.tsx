@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import type { Language } from '../translations';
 import './SelectedWork.css';
 import { WorkWave } from './WorkWave';
@@ -28,6 +29,7 @@ export function SelectedWork({ language }: { language: Language }) {
     media.add('(prefers-reduced-motion: no-preference)', () => {
       observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (!entry.isIntersecting) return;
+        if (!areAnimationsEnabled()) { observer?.unobserve(entry.target); return; }
         gsap.fromTo(entry.target, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: .8, ease: 'power3.out', clearProps: 'opacity,transform' });
         observer?.unobserve(entry.target);
       }), { threshold: .1 });

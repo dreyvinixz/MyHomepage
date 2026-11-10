@@ -1,3 +1,5 @@
+import { areAnimationsEnabled, subscribeMotionPreference } from './motionPreference';
+
 /** Runs only while visible; add ?perf=1 in development to log rendered FPS. */
 export function observeAnimation(element: Element, render: (elapsed: number) => void, fps = 30) {
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
@@ -18,11 +20,12 @@ export function observeAnimation(element: Element, render: (elapsed: number) => 
   };
   const update = () => {
     cancelAnimationFrame(frame); frame = 0; lastTick = 0; lastDraw = 0; sampleStart = 0; frames = 0;
-    if (visible && !document.hidden && !motion.matches) frame = requestAnimationFrame(tick);
-    else if (visible && motion.matches) render(Infinity);
+    if (visible && !document.hidden && !motion.matches && areAnimationsEnabled()) frame = requestAnimationFrame(tick);
+    else if (visible && (motion.matches || !areAnimationsEnabled())) render(Infinity);
   };
   const intersection = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; update(); });
   intersection.observe(element);
+  const unsubscribe = subscribeMotionPreference(update);
   motion.addEventListener('change', update); document.addEventListener('visibilitychange', update);
-  return () => { cancelAnimationFrame(frame); intersection.disconnect(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); };
+  return () => { cancelAnimationFrame(frame); intersection.disconnect(); unsubscribe(); motion.removeEventListener('change', update); document.removeEventListener('visibilitychange', update); };
 }

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
+import { areAnimationsEnabled } from '../lib/motionPreference';
 import type { Copy, Language } from '../translations';
 import './Footer.css';
 import { ArrowIcon } from './ArrowIcon';
@@ -21,6 +22,7 @@ export function Footer({ copy, language }: { copy: Copy; language: Language }) {
     media.add('(prefers-reduced-motion: no-preference)', () => {
       observer = new IntersectionObserver(entries => entries.forEach(entry => {
         if (!entry.isIntersecting) return;
+        if (!areAnimationsEnabled()) { observer?.unobserve(entry.target); return; }
         gsap.fromTo(entry.target, { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: .8, ease: 'power3.out', clearProps: 'opacity,transform' });
         observer?.unobserve(entry.target);
       }), { threshold: .1 });

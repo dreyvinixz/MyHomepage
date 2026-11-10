@@ -3,7 +3,7 @@
 ## Requirements and configuration
 
 - Node.js 24 LTS, `npm ci`, `npm test`, `npm run build` and `node scripts/check-build.mjs`.
-- `VITE_GA_MEASUREMENT_ID` is optional. Set a valid GA4 ID (`G-...`) in the deployment environment when available. Vite embeds it at build time; it is a public identifier, not a secret. Rebuild after changing it.
+- `VITE_GA_MEASUREMENT_ID` defaults to the site's GA4 measurement ID (`generec-id`). It can be overridden in the deployment environment. Vite embeds it at build time; it is a public identifier, not a secret. Analytics loads only after the visitor accepts cookies.
 - The domain is undecided. Configure the canonical URL, sitemap, and social metadata only after the final domain is known.
 
 ## Static hosting

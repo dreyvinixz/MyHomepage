@@ -31,7 +31,7 @@ npm run preview
 
 ## Analytics e privacidade
 
-Copie `.env.example` para `.env` e, quando disponível, defina `VITE_GA_MEASUREMENT_ID=G-...`. Sem ID válido, o Google Analytics permanece desativado. Mesmo com ID, o script só é carregado após aceitação; a escolha pode ser revista no rodapé ou na página de privacidade. O ID é público e faz parte do build. Não coloque credenciais no frontend.
+Copie `.env.example` para `.env` se quiser personalizar a configuração. O Google Analytics 4 usa `generic-key` por padrão e só carrega depois do aceite dos cookies; a escolha pode ser revista no rodapé ou na página de privacidade. `VITE_GA_MEASUREMENT_ID` pode substituir o ID no build. O ID é público, não uma credencial.
 
 ## Notas e publicações
 
