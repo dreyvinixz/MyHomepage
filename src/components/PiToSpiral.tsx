@@ -9,7 +9,7 @@ export function PiToSpiral() {
   const [hasScrolled, setHasScrolled] = useState(() => window.scrollY > 5);
   useEffect(() => { const onScroll = () => { if (window.scrollY > 5) setHasScrolled(true); }; window.addEventListener('scroll', onScroll, { passive: true }); return () => window.removeEventListener('scroll', onScroll); }, []);
   useEffect(() => {
-    if (!hasScrolled) return;
+    if (!hasScrolled || window.innerWidth <= 700) return;
     const el = host.current, hero = document.querySelector<HTMLElement>('.hero'), pi = document.querySelector<HTMLElement>('.pi-particles'), spiral = document.querySelector<HTMLElement>('.expertise-ambient');
     if (!el || !hero || !pi || !spiral) return;
     const motion = matchMedia('(prefers-reduced-motion: reduce)');

@@ -10,6 +10,7 @@ export function BackgroundScene() {
   useEffect(() => {
     const element = host.current;
     if (!element) return;
+    if (window.matchMedia('(max-width: 700px)').matches) return;
     let renderer: THREE.WebGLRenderer;
     try { renderer = new THREE.WebGLRenderer({ antialias: true }); }
     catch { return; }

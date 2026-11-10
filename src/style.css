@@ -42,6 +42,12 @@ html[data-animations="off"] .quantbase-chart-line { stroke-dashoffset:0; }
 html[data-animations="off"] .quantbase-chart-end { opacity:1; }
 @media (max-width: 420px) { header nav { gap: 12px !important; padding-inline: 12px !important; } .language-picker { padding-left: 10px; } }
 @media (max-width: 640px) { .motion-toggle span { display:none; } .motion-toggle { gap:0; } }
+@media (max-width: 700px) {
+  .hero > header { width: 100%; margin-top: 16px; }
+  .hero > header nav { justify-content: center; flex-wrap: wrap; gap: 12px; padding: 12px; }
+  .hero-space, .pi-particles { max-height: 280px; min-height: 220px; }
+  .hero #inicio { justify-content: flex-start; padding-top: 24px; padding-bottom: 48px; }
+}
 
 /* Departure Mono © 2022–2024 Helena Zhang; SIL Open Font License 1.1.
    License: public/fonts/OFL-1.1.txt */
