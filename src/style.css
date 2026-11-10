@@ -43,12 +43,11 @@ html[data-animations="off"] .quantbase-chart-end { opacity:1; }
 @media (max-width: 420px) { header nav { gap: 12px !important; padding-inline: 12px !important; } .language-picker { padding-left: 10px; } }
 @media (max-width: 640px) { .motion-toggle span { display:none; } .motion-toggle { gap:0; } }
 
-/* Technical typeface used alongside Inter on the reference blog.
-   Departure Mono © Helena Zhang; SIL Open Font License 1.1.
-   Served from its original public repository through jsDelivr. */
+/* Departure Mono © 2022–2024 Helena Zhang; SIL Open Font License 1.1.
+   License: public/fonts/OFL-1.1.txt */
 @font-face {
   font-family: 'Departure Mono';
-  src: url('https://cdn.jsdelivr.net/gh/rektdeckard/departure-mono@main/public/assets/DepartureMono-1.500.woff2') format('woff2');
+  src: url('/fonts/DepartureMono-1.500.woff2') format('woff2');
   font-style: normal;
   font-weight: 400;
   font-display: swap;
