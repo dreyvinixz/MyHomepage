@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { CookieConsent } from './CookieConsent';
+import { CookieConsent } from './PrivacyNotice';
 import { CONSENT_KEY } from '../lib/analytics';
 
 describe('cookie preferences', () => {

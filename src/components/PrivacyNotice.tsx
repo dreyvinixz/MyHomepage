@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { disableAnalytics, enableAnalytics, readConsent, saveConsent, type AnalyticsChoice } from '../lib/analytics';
-import './CookieConsent.css';
+import './PrivacyNotice.css';
 
 export function CookieConsent() {
   const [choice, setChoice] = useState<AnalyticsChoice | null>(readConsent);
