@@ -29,7 +29,7 @@ export function ExpertiseAmbient() {
     const geometry = new THREE.BufferGeometry(); geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3)); geometry.setAttribute('aSeed', new THREE.BufferAttribute(seeds, 1));
     const material = new THREE.ShaderMaterial({ uniforms: { uTime: { value: 0 }, uEnter: { value: 0 }, uExit: { value: 0 }, uScale: { value: new THREE.Vector2(1, 1) } },
       vertexShader: `attribute float aSeed; uniform float uTime; uniform float uEnter; uniform float uExit; uniform vec2 uScale; varying float vAlpha;
-        void main(){ float formed=smoothstep(aSeed*.3,.7+aSeed*.3,uEnter); vec2 target=position.xy; float angle=uTime*.08; target=mat2(cos(angle),-sin(angle)*.38,sin(angle)/.38,cos(angle))*target; vec2 origin=vec2((aSeed-.5)*.6,1.0+aSeed*.35); vec2 p=mix(origin,target,formed); p=mix(p,vec2((aSeed-.5)*.5,-1.0-aSeed*.3),uExit); gl_Position=vec4(p*uScale,0.,1.); gl_PointSize=.8+aSeed*1.7; vAlpha=formed*(1.-uExit)*(.4+aSeed*.6); }`,
+        void main(){ float formed=smoothstep(aSeed*.3,.7+aSeed*.3,uEnter); vec2 target=position.xy; float angle=uTime*.18; target=mat2(cos(angle),-sin(angle)*.38,sin(angle)/.38,cos(angle))*target; vec2 origin=vec2((aSeed-.5)*.6,1.0+aSeed*.35); vec2 p=mix(origin,target,formed); p=mix(p,vec2((aSeed-.5)*.5,-1.0-aSeed*.3),uExit); gl_Position=vec4(p*uScale,0.,1.); gl_PointSize=.8+aSeed*1.7; vAlpha=formed*(1.-uExit)*(.4+aSeed*.6); }`,
       fragmentShader: `varying float vAlpha; void main(){ if(length(gl_PointCoord-.5)>.5) discard; gl_FragColor=vec4(.91,.96,1.,vAlpha); }`, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false });
     const scene = new THREE.Scene(); scene.add(new THREE.Points(geometry,material)); const camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
     const draw = () => renderer.render(scene,camera);
@@ -46,7 +46,7 @@ export function ExpertiseAmbient() {
       // Settle and clear the spiral before the next section's heading animates in.
       const animationsEnabled = areAnimationsEnabled() && !motion.matches;
       const exit = animationsEnabled ? THREE.MathUtils.clamp((innerHeight * .95 - headingTop) / (innerHeight * .4), 0, 1) : 0;
-      material.uniforms.uEnter.value = animationsEnabled ? THREE.MathUtils.clamp((progress - .72) / .28, 0, 1) : 1;
+      material.uniforms.uEnter.value = animationsEnabled ? THREE.MathUtils.clamp((progress - .4) / .6, 0, 1) : 1;
       material.uniforms.uExit.value = exit;
       if (rect.top < innerHeight && rect.bottom > 0) draw();
     };

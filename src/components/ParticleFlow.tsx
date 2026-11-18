@@ -43,9 +43,9 @@ export function ParticleFlow() {
       const sectionRect = expertise.getBoundingClientRect(), treeRect = tree.getBoundingClientRect();
       const spiralRect = expertise.querySelector<HTMLElement>('.expertise-ambient')?.getBoundingClientRect();
       const sourceY = spiralRect ? spiralRect.top + spiralRect.height / 2 : sectionRect.bottom;
-      // Begin the handoff after the expertise spiral has cleared the viewport.
-      const start = sectionRect.bottom + scrollY - innerHeight * .4;
-      const end = treeRect.top + scrollY - innerHeight * .3;
+      // Spread the handoff across the approach to the tree, even on short layouts.
+      const start = sectionRect.bottom + scrollY - innerHeight * 1.1;
+      const end = Math.max(treeRect.top + scrollY - innerHeight * .3, start + innerHeight);
       const progress = THREE.MathUtils.clamp((scrollY-start)/Math.max(end-start,1),0,1);
       material.uniforms.uProgress.value = progress;
       material.uniforms.uSource.value.set(innerWidth / 2, sourceY);
