@@ -20,9 +20,13 @@ export function areAnimationsEnabled() {
 export function setAnimationsEnabled(enabled: boolean) {
   try { localStorage.setItem(STORAGE_KEY, enabled ? 'on' : 'off'); } catch { /* The current page still follows this choice. */ }
   applyPreference();
-  if (enabled) gsap.globalTimeline.resume();
-  else gsap.globalTimeline.pause();
+  if (!enabled) finishAnimations();
   window.dispatchEvent(new Event(CHANGE_EVENT));
+}
+
+function finishAnimations() {
+  // Complete active entrance animations so their elements cannot remain invisible.
+  gsap.globalTimeline.getChildren(false, true, true).forEach(animation => animation.progress(1));
 }
 
 export function subscribeMotionPreference(listener: () => void) {
@@ -37,13 +41,11 @@ function applyPreference() {
 
 export function initializeMotionPreference() {
   applyPreference();
-  if (!areAnimationsEnabled()) gsap.globalTimeline.pause();
   const systemPreference = matchMedia('(prefers-reduced-motion: reduce)');
   const onSystemPreferenceChange = () => {
     if (storedPreference() === null) {
       applyPreference();
-      if (areAnimationsEnabled()) gsap.globalTimeline.resume();
-      else gsap.globalTimeline.pause();
+      if (!areAnimationsEnabled()) finishAnimations();
       window.dispatchEvent(new Event(CHANGE_EVENT));
     }
   };

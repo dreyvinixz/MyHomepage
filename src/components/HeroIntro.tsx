@@ -26,7 +26,7 @@ export function HeroIntro({ copy, language }: { copy: Copy; language: Language }
       }, { threshold: .05 });
       observer.observe(element);
       document.addEventListener('visibilitychange', update);
-      return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); timeline?.kill(); };
+      return () => { observer.disconnect(); document.removeEventListener('visibilitychange', update); timeline?.revert(); };
     });
     return () => media.revert();
   }, []);
